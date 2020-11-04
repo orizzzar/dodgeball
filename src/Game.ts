@@ -34,6 +34,11 @@ class Game {
         this.canvas.width = window.innerWidth - Game.WINDOW_WIDTH_OFFSET;
         this.canvas.height = window.innerHeight - Game.WINDOW_HEIGHT_OFFSET; 
         
+        // Transform the rendering context so that (0,0) is the lower left 
+        // corner.
+        const ctx = this.canvas.getContext('2d');
+        ctx.transform(1, 0, 0, -1, 0, this.canvas.height);
+
         // Spawn a Ball
         const radius = Game.MIN_BALL_RADIUS + Game.BALL_RADIUS_SCATTER * Math.random();
         this.ball = new Ball(
@@ -138,18 +143,12 @@ class Game {
         // Draw the player
         ctx.fillStyle = Game.PLAYER_COLOR;
         ctx.beginPath();
-        const playerPositionY = this.canvas.height - Game.PLAYER_BALL_RADIUS;
+        const playerPositionY = Game.PLAYER_BALL_RADIUS;
         ctx.ellipse(this.playerPositionX, playerPositionY, 
             Game.PLAYER_BALL_RADIUS, Game.PLAYER_BALL_RADIUS, 0, 0, Game.FULL_CIRCLE);
         ctx.fill();
 
         // Draw the ball
-        ctx.fillStyle = Game.BALL_COLOR;
-        ctx.beginPath();
-        // reverse height, so the ball falls down
-        const y = this.canvas.height - this.ball.positionY;
-        ctx.ellipse(this.ball.positionX, y, this.ball.radius, this.ball.radius, 
-            0, 0, Game.FULL_CIRCLE);
-        ctx.fill();
+        this.ball.draw(ctx);
     }
 }
