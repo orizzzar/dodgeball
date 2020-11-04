@@ -21,13 +21,15 @@ class Game {
     public static readonly BALL_Y_POSITION_AREA = 0.2;
     public static readonly BALL_COLOR = 'blue';
 
+    public static readonly INITIAL_BALL_COUNT = 2;
+
     // Constants for the player
     public static readonly PLAYER_BALL_RADIUS = 50;
     public static readonly PLAYER_COLOR = 'red';
 
     private canvas: HTMLCanvasElement;
 
-    private ball: Ball;
+    private balls: Ball[];
 
     private player: Ball;
 
@@ -48,17 +50,12 @@ class Game {
         const ctx = this.canvas.getContext('2d');
         ctx.transform(1, 0, 0, -1, 0, this.canvas.height);
 
-        // Spawn a Ball
-        const radius = Game.MIN_BALL_RADIUS + Game.BALL_RADIUS_SCATTER * Math.random();
-        this.ball = new Ball(
-            radius,
-            radius + (this.canvas.width - 2 * radius)*Math.random(),
-            this.canvas.height * (1 - Game.BALL_Y_POSITION_AREA) + 
-                this.canvas.height * Game.BALL_Y_POSITION_AREA * Math.random(),
-            Game.MIN_BALL_X_SPEED + Game.BALL_X_SPEED_SCATTER * Math.random(),
-            Game.MIN_BALL_Y_SPEED + Game.BALL_Y_SPEED_SCATTER * Math.random(),
-            Game.BALL_COLOR
-        );
+        // Spawn the Balls
+        this.balls = [];
+        for(let i=0; i<Game.INITIAL_BALL_COUNT; i++) {
+            this.balls.push(this.spawnBall());
+        }
+
         
         // Spawn the player
         this.player = new Ball(Game.PLAYER_BALL_RADIUS, this.canvas.width / 2,
@@ -69,6 +66,22 @@ class Game {
         requestAnimationFrame(this.animate);
     }
 
+
+    /**
+     * Helper method that creates a random Ball.
+     */
+    private spawnBall(): Ball {
+        const radius = Game.MIN_BALL_RADIUS + Game.BALL_RADIUS_SCATTER * Math.random();
+        return new Ball(
+            radius,
+            radius + (this.canvas.width - 2 * radius)*Math.random(),
+            this.canvas.height * (1 - Game.BALL_Y_POSITION_AREA) + 
+                this.canvas.height * Game.BALL_Y_POSITION_AREA * Math.random(),
+            Game.MIN_BALL_X_SPEED + Game.BALL_X_SPEED_SCATTER * Math.random(),
+            Game.MIN_BALL_Y_SPEED + Game.BALL_Y_SPEED_SCATTER * Math.random(),
+            Game.BALL_COLOR
+        );
+    }
 
     /**
      * This MUST be an arrow method in order to keep the `this` variable 
@@ -94,21 +107,24 @@ class Game {
      */
     private move() {
         // calculate the new position of the ball
-        this.ball.applyPhysics();
+        this.balls.forEach((ball) => ball.applyPhysics());
     }
 
     /**
      * Check if gameitems are colliding, and handle them.
      */
     private collide() {
-        this.ball.bounceToWalls(0, this.canvas.width, 0);
+        this.balls.forEach((ball) => 
+            ball.bounceToWalls(0, this.canvas.width, 0));
     }
 
     /**
      * Adjust the game state if needed
      */
     private adjust() {
-        return this.player.overlapsWithBall(this.ball);
+        return this.balls.reduce((prev, ball) => 
+          prev || this.player.overlapsWithBall(ball)
+        , false);
     }
 
     /**
@@ -124,6 +140,6 @@ class Game {
         this.player.draw(ctx);
 
         // Draw the ball
-        this.ball.draw(ctx);
+        this.balls.forEach((ball) => ball.draw(ctx));
     }
 }
