@@ -56,7 +56,6 @@ class Game {
             this.balls.push(this.spawnBall());
         }
 
-        
         // Spawn the player
         this.player = new Ball(Game.PLAYER_BALL_RADIUS, this.canvas.width / 2,
             Game.PLAYER_BALL_RADIUS, 0, 0, Game.PLAYER_COLOR);
