@@ -3,16 +3,29 @@
  */
 class Ball {
 
-    // TODO: encapsulate
     private radius: number;
+
     private positionX: number;
+
     private positionY: number;
+
     private speedX: number;
+
     private speedY: number;
 
     private color: string;
 
 
+    /**
+     * Constructor that defines how to construct a new object of this class.
+     * 
+     * @param radius 
+     * @param positionX 
+     * @param positionY 
+     * @param speedX 
+     * @param speedY 
+     * @param color 
+     */
     public constructor(radius: number, positionX: number,
         positionY: number, speedX: number, speedY: number, color:string) {
             this.radius = radius;
@@ -23,20 +36,30 @@ class Ball {
             this.color = color;
     }
 
+    /**
+     * Apply the laws of physics to the movement of the ball. the y-portion of 
+     * the speed changes due to gravity.
+     * Formula for vertical speed: Vt = V0 + gt
+     * Formula for horizontal displacement: S = v*t
+     * Formula for vertical displacement: S=v0*t + 0.5*g*t^2
+     * Game.GRAVITY defines the gravitational constant (g) and time (t) is 
+     * assumed 1
+     */
     public applyPhysics() {
-        // Some physics here: the y-portion of the speed changes due to gravity
-        // Formula: Vt = V0 + gt
-        // 9.8 is the gravitational constant and time=1
         this.speedY -= Game.GRAVITY;
         // Calculate new X and Y parts of the position 
-        // Formula: S = v*t
         this.positionX += this.speedX;
-        // Formula: S=v0*t + 0.5*g*t^2
         this.positionY += this.speedY + 0.5 * Game.GRAVITY;
     }
 
+    /**
+     * Check if the ball hits the walls and let it bounce.
+     * 
+     * @param left 
+     * @param right 
+     * @param lower 
+     */
     public bounceToWalls(left: number, right: number, lower: number) {
-        // check if the ball hits the walls and let it bounce
         // Left wall
         if (this.positionX <= this.radius && this.speedX < left) {
             this.speedX = -this.speedX;
@@ -54,8 +77,12 @@ class Ball {
 
     }
 
+    /**
+     * Check of this Ball overlaps (collides) with another Ball.
+     * 
+     * @param ball 
+     */
     public overlapsWithBall(ball: Ball) {
-        // Check if the ball collides with the player. It's game over then
         const distX = ball.positionX - this.positionX;
         const distY = ball.positionY - this.positionY;
         // Calculate the distance between ball and player using Pythagoras'
@@ -65,10 +92,14 @@ class Ball {
         return distance <= (this.radius + ball.radius);
     }
 
+    /**
+     * Draw this Ball to the specified context.
+     * 
+     * @param ctx 
+     */
     public draw(ctx: CanvasRenderingContext2D) {
         ctx.fillStyle = this.color;
         ctx.beginPath();
-        // reverse height, so the ball falls down
         ctx.ellipse(this.positionX, this.positionY, this.radius, 
             this.radius, 0, 0, Game.FULL_CIRCLE);
         ctx.fill();

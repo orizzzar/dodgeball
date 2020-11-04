@@ -3,18 +3,15 @@
  */
 class Game {
 
-    private canvas: HTMLCanvasElement;
-
-    private ball: Ball;
-
-    private player: Ball;
-
+    // Constants for removing the scroll bars in the browser
     public static readonly WINDOW_WIDTH_OFFSET = 1;
     public static readonly WINDOW_HEIGHT_OFFSET = 4;
 
+    // Generic math and physics constants
     public static readonly GRAVITY = 0.98;
     public static readonly FULL_CIRCLE = 2 * Math.PI;
 
+    // Constants that define the allowed ball dimensions
     public static readonly MIN_BALL_RADIUS = 25;
     public static readonly BALL_RADIUS_SCATTER = 25;
     public static readonly MIN_BALL_X_SPEED = -50;
@@ -24,9 +21,21 @@ class Game {
     public static readonly BALL_Y_POSITION_AREA = 0.2;
     public static readonly BALL_COLOR = 'blue';
 
+    // Constants for the player
     public static readonly PLAYER_BALL_RADIUS = 50;
     public static readonly PLAYER_COLOR = 'red';
 
+    private canvas: HTMLCanvasElement;
+
+    private ball: Ball;
+
+    private player: Ball;
+
+    /**
+     * Constructor that defines how to construct a new object of this class.
+     * 
+     * @param canvas 
+     */
     public constructor(canvas: HTMLElement) {
         this.canvas = <HTMLCanvasElement>canvas;
         
