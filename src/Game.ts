@@ -97,15 +97,8 @@ class Game {
      * Adjust the game state if needed
      */
     private adjust() {
-        // Check if the ball collides with the player. It's game over then
-        const distX = this.playerPositionX - this.ball.positionX;
-        const distY = 50 - this.ball.positionY;
-        // Calculate the distance between ball and player using Pythagoras'
-        // theorem
-        const distance = Math.sqrt(distX * distX + distY * distY);
-        // Collides is distance <= sum of radii of both circles
-        const gameover = distance <= (this.ball.radius + Game.PLAYER_BALL_RADIUS);
-        return gameover;
+        return this.ball.overlapsWithCircle(this.playerPositionX, 
+            Game.PLAYER_BALL_RADIUS, Game.PLAYER_BALL_RADIUS);
     }
 
     /**
