@@ -83,15 +83,7 @@ class Game {
      */
     private move() {
         // calculate the new position of the ball
-        // Some physics here: the y-portion of the speed changes due to gravity
-        // Formula: Vt = V0 + gt
-        // 9.8 is the gravitational constant and time=1
-        this.ball.speedY -= Game.GRAVITY;
-        // Calculate new X and Y parts of the position 
-        // Formula: S = v*t
-        this.ball.positionX += this.ball.speedX;
-        // Formula: S=v0*t + 0.5*g*t^2
-        this.ball.positionY += this.ball.speedY + 0.5 * Game.GRAVITY;
+        this.ball.applyPhysics();
     }
 
     /**

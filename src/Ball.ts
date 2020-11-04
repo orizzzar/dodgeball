@@ -20,6 +20,18 @@ class Ball {
             this.speedY = speedY;
     }
 
+    public applyPhysics() {
+        // Some physics here: the y-portion of the speed changes due to gravity
+        // Formula: Vt = V0 + gt
+        // 9.8 is the gravitational constant and time=1
+        this.speedY -= Game.GRAVITY;
+        // Calculate new X and Y parts of the position 
+        // Formula: S = v*t
+        this.positionX += this.speedX;
+        // Formula: S=v0*t + 0.5*g*t^2
+        this.positionY += this.speedY + 0.5 * Game.GRAVITY;
+    }
+
     public draw(ctx: CanvasRenderingContext2D) {
         ctx.fillStyle = Game.BALL_COLOR;
         ctx.beginPath();
