@@ -90,22 +90,7 @@ class Game {
      * Check if gameitems are colliding, and handle them.
      */
     private collide() {
-        // check if the ball hits the walls and let it bounce
-        // Left wall
-        this.ball.positionX >= this.canvas.width - this.ball.radius;
-        if (this.ball.positionX <= this.ball.radius && this.ball.speedX < 0) {
-            this.ball.speedX = -this.ball.speedX;
-        }
-        // Right wall
-        if (this.ball.positionX >= this.canvas.width - this.ball.radius
-            && this.ball.speedX > 0) {
-            this.ball.speedX = -this.ball.speedX;
-        }
-
-        // Bottom only (ball will always come down)
-        if (this.ball.positionY <= this.ball.radius && this.ball.speedY < 0) {
-            this.ball.speedY = -this.ball.speedY;
-        }
+        this.ball.bounceToWalls(0, this.canvas.width, 0);
     }
 
     /**

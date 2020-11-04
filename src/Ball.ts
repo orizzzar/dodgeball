@@ -32,6 +32,25 @@ class Ball {
         this.positionY += this.speedY + 0.5 * Game.GRAVITY;
     }
 
+    public bounceToWalls(left: number, right: number, lower: number) {
+        // check if the ball hits the walls and let it bounce
+        // Left wall
+        if (this.positionX <= this.radius && this.speedX < left) {
+            this.speedX = -this.speedX;
+        }
+        // Right wall
+        if (this.positionX >= right - this.radius
+            && this.speedX > 0) {
+            this.speedX = -this.speedX;
+        }
+
+        // Bottom only (ball will always come down)
+        if (this.positionY <= this.radius && this.speedY < lower) {
+            this.speedY = -this.speedY;
+        }
+
+    }
+
     public draw(ctx: CanvasRenderingContext2D) {
         ctx.fillStyle = Game.BALL_COLOR;
         ctx.beginPath();
