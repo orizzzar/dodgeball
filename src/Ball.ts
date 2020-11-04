@@ -10,14 +10,17 @@ class Ball {
     private speedX: number;
     private speedY: number;
 
+    private color: string;
+
 
     public constructor(radius: number, positionX: number,
-        positionY: number, speedX: number, speedY: number) {
+        positionY: number, speedX: number, speedY: number, color:string) {
             this.radius = radius;
             this.positionX = positionX;
             this.positionY = positionY;
             this.speedX = speedX;
             this.speedY = speedY;
+            this.color = color;
     }
 
     public applyPhysics() {
@@ -51,19 +54,19 @@ class Ball {
 
     }
 
-    overlapsWithCircle(centerX: number, centerY: number, radius: number) {
+    public overlapsWithBall(ball: Ball) {
         // Check if the ball collides with the player. It's game over then
-        const distX = centerX - this.positionX;
-        const distY = centerY - this.positionY;
+        const distX = ball.positionX - this.positionX;
+        const distY = ball.positionY - this.positionY;
         // Calculate the distance between ball and player using Pythagoras'
         // theorem
         const distance = Math.sqrt(distX * distX + distY * distY);
         // Collides is distance <= sum of radii of both circles
-        return distance <= (this.radius + radius);
+        return distance <= (this.radius + ball.radius);
     }
 
     public draw(ctx: CanvasRenderingContext2D) {
-        ctx.fillStyle = Game.BALL_COLOR;
+        ctx.fillStyle = this.color;
         ctx.beginPath();
         // reverse height, so the ball falls down
         ctx.ellipse(this.positionX, this.positionY, this.radius, 

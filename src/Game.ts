@@ -7,7 +7,7 @@ class Game {
 
     private ball: Ball;
 
-    private playerPositionX: number;
+    private player: Ball;
 
     public static readonly WINDOW_WIDTH_OFFSET = 1;
     public static readonly WINDOW_HEIGHT_OFFSET = 4;
@@ -47,11 +47,13 @@ class Game {
             this.canvas.height * (1 - Game.BALL_Y_POSITION_AREA) + 
                 this.canvas.height * Game.BALL_Y_POSITION_AREA * Math.random(),
             Game.MIN_BALL_X_SPEED + Game.BALL_X_SPEED_SCATTER * Math.random(),
-            Game.MIN_BALL_Y_SPEED + Game.BALL_Y_SPEED_SCATTER * Math.random()
+            Game.MIN_BALL_Y_SPEED + Game.BALL_Y_SPEED_SCATTER * Math.random(),
+            Game.BALL_COLOR
         );
         
-        // Set the player at the center
-        this.playerPositionX = this.canvas.width / 2;
+        // Spawn the player
+        this.player = new Ball(Game.PLAYER_BALL_RADIUS, this.canvas.width / 2,
+            Game.PLAYER_BALL_RADIUS, 0, 0, Game.PLAYER_COLOR);
 
         // Start the animation
         console.log('start animation');
@@ -97,8 +99,7 @@ class Game {
      * Adjust the game state if needed
      */
     private adjust() {
-        return this.ball.overlapsWithCircle(this.playerPositionX, 
-            Game.PLAYER_BALL_RADIUS, Game.PLAYER_BALL_RADIUS);
+        return this.player.overlapsWithBall(this.ball);
     }
 
     /**
@@ -111,12 +112,7 @@ class Game {
         ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
         // Draw the player
-        ctx.fillStyle = Game.PLAYER_COLOR;
-        ctx.beginPath();
-        const playerPositionY = Game.PLAYER_BALL_RADIUS;
-        ctx.ellipse(this.playerPositionX, playerPositionY, 
-            Game.PLAYER_BALL_RADIUS, Game.PLAYER_BALL_RADIUS, 0, 0, Game.FULL_CIRCLE);
-        ctx.fill();
+        this.player.draw(ctx);
 
         // Draw the ball
         this.ball.draw(ctx);
