@@ -8,24 +8,45 @@ class Game {
     public static readonly WINDOW_HEIGHT_OFFSET = 4;
 
     // Generic math and physics constants
-    public static readonly GRAVITY = 0.98;
+    public static readonly GRAVITY = 9.8/2000;
     public static readonly FULL_CIRCLE = 2 * Math.PI;
 
     // Constants that define the allowed ball dimensions
     public static readonly MIN_BALL_RADIUS = 25;
     public static readonly BALL_RADIUS_SCATTER = 25;
-    public static readonly MIN_BALL_X_SPEED = -50;
-    public static readonly BALL_X_SPEED_SCATTER = 100;
+    public static readonly MIN_BALL_X_SPEED = -0.5;
+    public static readonly BALL_X_SPEED_SCATTER = 1;
     public static readonly MIN_BALL_Y_SPEED = 0;
     public static readonly BALL_Y_SPEED_SCATTER = 0;
     public static readonly BALL_Y_POSITION_AREA = 0.2;
     public static readonly BALL_COLOR = 'blue';
 
-    public static readonly INITIAL_BALL_COUNT = 2;
+    public static readonly INITIAL_BALL_COUNT = 4;
 
     // Constants for the player
     public static readonly PLAYER_BALL_RADIUS = 50;
     public static readonly PLAYER_COLOR = 'red';
+
+    /**
+     * The timestamp at the start of the previous animation frame or the 
+     * moment of instantiation of this object.
+     */
+    private previous: number;
+
+    /**
+     * The amount of ms that the game's "now" is behind the player's.
+     */
+    private lag: number;
+
+    /**
+     * The size of the fixed time steps that the game's "now" will be updated.
+     */
+    protected readonly ms_per_update: number;
+    
+    /**
+     * Reference to the requestAnimation timeout, so it can be canceled.
+     */
+    private ref_id: number;
 
     private canvas: HTMLCanvasElement;
 
@@ -62,7 +83,12 @@ class Game {
 
         // Start the animation
         console.log('start animation');
-        requestAnimationFrame(this.animate);
+        this.ms_per_update = 1;
+
+        this.previous = performance.now();
+        this.lag = 0;
+
+        this.ref_id = requestAnimationFrame(this.animate);
     }
 
 
@@ -87,11 +113,21 @@ class Game {
      * working correctly. It will be overwritten by another object otherwise
      * caused by javascript scoping behaviour.
      */
-    animate = () => {
-        this.move();
-        this.collide();
-        const gameover = this.adjust();
-        this.draw();
+    animate = (timestamp: number) => {
+        const elapsed = timestamp - this.previous;
+        this.previous = timestamp;
+        this.lag += elapsed;
+      
+        //this.processInput(timestamp);
+      
+        let gameover = false;
+        while (!gameover && this.lag >= this.ms_per_update)
+        {
+            gameover = this.update();
+            this.lag -= this.ms_per_update;
+        }
+      
+        this.render();
 
         // Call this method again on the next animation frame
         // A quick-and-dirty game over situation: just stop animating :/
@@ -102,25 +138,14 @@ class Game {
     }
 
     /**
-     * Move the items over the scene
-     */
-    private move() {
-        // calculate the new position of the ball
-        this.balls.forEach((ball) => ball.applyPhysics());
-    }
-
-    /**
-     * Check if gameitems are colliding, and handle them.
-     */
-    private collide() {
-        this.balls.forEach((ball) => 
-            ball.bounceToWalls(0, this.canvas.width, 0));
-    }
-
-    /**
      * Adjust the game state if needed
      */
-    private adjust() {
+    private update() {
+        // calculate the new position of the ball
+        this.balls.forEach((ball) => ball.applyPhysics());
+        this.balls.forEach((ball) => 
+            ball.bounceToWalls(0, this.canvas.width, 0));
+
         return this.balls.reduce((prev, ball) => 
           prev || this.player.overlapsWithBall(ball)
         , false);
@@ -129,7 +154,7 @@ class Game {
     /**
      * Draw the scene on the screen.
      */
-    private draw() {
+    private render() {
         // Get the canvas rendering context
         const ctx = this.canvas.getContext('2d');
         // Clear the entire canvas
