@@ -27,26 +27,9 @@ class Game {
     public static readonly PLAYER_BALL_RADIUS = 50;
     public static readonly PLAYER_COLOR = 'red';
 
-    /**
-     * The timestamp at the start of the previous animation frame or the 
-     * moment of instantiation of this object.
-     */
-    private previous: number;
+    private gameLoop: GameLoop;
 
-    /**
-     * The amount of ms that the game's "now" is behind the player's.
-     */
-    private lag: number;
-
-    /**
-     * The size of the fixed time steps that the game's "now" will be updated.
-     */
-    protected readonly ms_per_update: number;
-    
-    /**
-     * Reference to the requestAnimation timeout, so it can be canceled.
-     */
-    private ref_id: number;
+    private keyboard: KeyListener;
 
     private canvas: HTMLCanvasElement;
 
@@ -81,14 +64,11 @@ class Game {
         this.player = new Ball(Game.PLAYER_BALL_RADIUS, this.canvas.width / 2,
             Game.PLAYER_BALL_RADIUS, 0, 0, Game.PLAYER_COLOR);
 
+        this.keyboard = new KeyListener();
+
         // Start the animation
-        console.log('start animation');
-        this.ms_per_update = 1;
-
-        this.previous = performance.now();
-        this.lag = 0;
-
-        this.ref_id = requestAnimationFrame(this.animate);
+        this.gameLoop = new GameLoop(this);
+        this.gameLoop.start();
     }
 
 
@@ -109,40 +89,29 @@ class Game {
     }
 
     /**
-     * This MUST be an arrow method in order to keep the `this` variable 
-     * working correctly. It will be overwritten by another object otherwise
-     * caused by javascript scoping behaviour.
+     * Process all the inputs for this game.
+     * 
+     * @param timestamp 
      */
-    animate = (timestamp: number) => {
-        const elapsed = timestamp - this.previous;
-        this.previous = timestamp;
-        this.lag += elapsed;
-      
-        //this.processInput(timestamp);
-      
-        let gameover = false;
-        while (!gameover && this.lag >= this.ms_per_update)
-        {
-            gameover = this.update();
-            this.lag -= this.ms_per_update;
-        }
-      
-        this.render();
+    processInput(timestamp: number) {
+        this.keyboard.onFrameStart();
 
-        // Call this method again on the next animation frame
-        // A quick-and-dirty game over situation: just stop animating :/
-        // The user must hit F5 to reload the game
-        if (!gameover) {
-            requestAnimationFrame(this.animate);
+        if (this.keyboard.isKeyDown(KeyListener.KEY_LEFT)) {
+            this.player.moveX(-5);
+        }
+        if (this.keyboard.isKeyDown(KeyListener.KEY_RIGHT)) {
+            this.player.moveX(5);
         }
     }
 
     /**
      * Adjust the game state if needed
+     * 
+     * @param dt Time (in ms) that has elapsed since the last update
      */
-    private update() {
+    public update(dt: number) {
         // calculate the new position of the ball
-        this.balls.forEach((ball) => ball.applyPhysics());
+        this.balls.forEach((ball) => ball.applyPhysics(dt));
         this.balls.forEach((ball) => 
             ball.bounceToWalls(0, this.canvas.width, 0));
 
@@ -154,7 +123,7 @@ class Game {
     /**
      * Draw the scene on the screen.
      */
-    private render() {
+    public render() {
         // Get the canvas rendering context
         const ctx = this.canvas.getContext('2d');
         // Clear the entire canvas

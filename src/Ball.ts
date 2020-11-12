@@ -37,6 +37,24 @@ class Ball {
     }
 
     /**
+     * Move the ball to the left over the specified distance.
+     * 
+     * @param dx the amount of pixels to move (positive is to the right)
+     */
+    public moveX(dx: number) {
+        this.positionX += dx;
+    }
+
+    /**
+     * Move the ball to the top over the specified distance.
+     * 
+     * @param dy the amount of pixels to move (positive is up)
+     */
+    public moveY(dy: number) {
+        this.positionY += dy;
+    }
+
+    /**
      * Apply the laws of physics to the movement of the ball. the y-portion of 
      * the speed changes due to gravity.
      * Formula for vertical speed: Vt = V0 + gt
@@ -45,11 +63,11 @@ class Ball {
      * Game.GRAVITY defines the gravitational constant (g) and time (t) is 
      * assumed 1
      */
-    public applyPhysics() {
+    public applyPhysics(dt: number) {
         this.speedY -= Game.GRAVITY;
         // Calculate new X and Y parts of the position 
-        this.positionX += this.speedX;
-        this.positionY += this.speedY + 0.5 * Game.GRAVITY;
+        this.moveX(this.speedX*dt);
+        this.moveY(this.speedY*dt + 0.5 * Game.GRAVITY*dt*dt);
     }
 
     /**
