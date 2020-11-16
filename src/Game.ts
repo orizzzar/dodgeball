@@ -54,11 +54,25 @@ class Game {
         const elapsed = timestamp - this.previous;
         this.previous = timestamp;
 
+        const gameover = this.update(elapsed);
+
+        this.render();
+
+        // Call this method again on the next animation frame
+        // A quick-and-dirty game over situation: just stop animating :/
+        // The user must hit F5 to reload the game
+        if (!gameover) {
+            requestAnimationFrame(this.step);
+        }
+    }
+
+
+    private update(elapsed: number) {
         // Calculate the new position of the ball
         // Some physics here: the y-portion of the speed changes due to gravity
         // Formula: Vt = V0 + gt
         // 9.8 is the gravitational constant and time=1
-        this.ballSpeedY -= 0.0098 * elapsed; 
+        this.ballSpeedY -= 0.0098 * elapsed;
         // Calculate new X and Y parts of the position 
         // Formula: S = v*t
         this.ballPositionX += this.ballSpeedX * elapsed;
@@ -67,18 +81,18 @@ class Game {
 
         // Collision detection: check if the ball hits the walls and let it bounce
         // Left wall
-            this.ballPositionX >= this.canvas.width-this.ballRadius;
-        if(this.ballPositionX <= this.ballRadius && this.ballSpeedX<0) {
+        this.ballPositionX >= this.canvas.width - this.ballRadius;
+        if (this.ballPositionX <= this.ballRadius && this.ballSpeedX < 0) {
             this.ballSpeedX = -this.ballSpeedX;
         }
         // Right wall
-        if(this.ballPositionX >= this.canvas.width-this.ballRadius 
-            && this.ballSpeedX>0) {
+        if (this.ballPositionX >= this.canvas.width - this.ballRadius
+            && this.ballSpeedX > 0) {
             this.ballSpeedX = -this.ballSpeedX;
         }
 
         // Bottom only (ball will always come down)
-        if(this.ballPositionY <= this.ballRadius && this.ballSpeedY < 0) {
+        if (this.ballPositionY <= this.ballRadius && this.ballSpeedY < 0) {
             this.ballSpeedY = -this.ballSpeedY;
         }
 
@@ -87,10 +101,14 @@ class Game {
         const distY = 50 - this.ballPositionY;
         // Calculate the distance between ball and player using Pythagoras'
         // theorem
-        const distance = Math.sqrt(distX*distX + distY*distY);
+        const distance = Math.sqrt(distX * distX + distY * distY);
         // Collides is distance <= sum of radii of both circles
         const gameover = distance <= (this.ballRadius + 50);
+        return gameover;
+    }
 
+    
+    private render() {
         // Render the items on the canvas
         // Get the canvas rendering context
         const ctx = this.canvas.getContext('2d');
@@ -100,23 +118,16 @@ class Game {
         // Render the player
         ctx.fillStyle = 'red';
         ctx.beginPath();
-        ctx.ellipse(this.playerPositionX, 50, 50, 50, 0, 0, 2*Math.PI);
+        ctx.ellipse(this.playerPositionX, 50, 50, 50, 0, 0, 2 * Math.PI);
         ctx.fill();
 
         // Render the ball
         ctx.fillStyle = 'blue';
         ctx.beginPath();
         // reverse height, so the ball falls down
-        ctx.ellipse(this.ballPositionX, this.ballPositionY, this.ballRadius, 
-            this.ballRadius, 0, 0, 2*Math.PI);
+        ctx.ellipse(this.ballPositionX, this.ballPositionY, this.ballRadius,
+            this.ballRadius, 0, 0, 2 * Math.PI);
         ctx.fill();
-
-        // Call this method again on the next animation frame
-        // A quick-and-dirty game over situation: just stop animating :/
-        // The user must hit F5 to reload the game
-        if (!gameover) {
-            requestAnimationFrame(this.step);
-        }
     }
 
 }
