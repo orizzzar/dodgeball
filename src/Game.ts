@@ -3,6 +3,22 @@
  */
 class Game {
 
+    public static readonly GRAVITY = 0.0098;
+    public static readonly FULL_CIRCLE = Math.PI * 2;
+
+    // Constants that define the allowed ball dimensions
+    public static readonly MIN_BALL_RADIUS = 25;
+    public static readonly BALL_RADIUS_SCATTER = 25;
+    public static readonly MIN_BALL_X_SPEED = -5;
+    public static readonly BALL_X_SPEED_SCATTER = 10;
+    public static readonly MIN_BALL_Y_SPEED = 0;
+    public static readonly BALL_Y_POSITION_AREA = 0.2;
+    public static readonly BALL_COLOR = 'blue';
+
+    // Constants for the player
+    public static readonly PLAYER_BALL_RADIUS = 50;
+    public static readonly PLAYER_COLOR = 'red';
+
     private canvas: HTMLCanvasElement;
 
     private ballRadius: number;
@@ -28,12 +44,13 @@ class Game {
         ctx.transform(1, 0, 0, -1, 0, this.canvas.height);
 
         // Spawn a Ball
-        this.ballRadius = 25 + 25 * Math.random();
-        this.ballSpeedX = -5 + 10 * Math.random();
-        this.ballSpeedY = 0;
+        this.ballRadius = Game.MIN_BALL_RADIUS + Game.BALL_RADIUS_SCATTER * Math.random();
+        this.ballSpeedX = -Game.MIN_BALL_X_SPEED + Game.BALL_X_SPEED_SCATTER * Math.random();
+        this.ballSpeedY = Game.MIN_BALL_Y_SPEED;
         this.ballPositionX = this.ballRadius +  
             (this.canvas.width - 2 * this.ballRadius)*Math.random();
-        this.ballPositionY = this.canvas.height * 0.8 + this.canvas.height * 0.2 * Math.random();
+        this.ballPositionY = this.canvas.height * (1-Game.BALL_Y_POSITION_AREA) 
+            + this.canvas.height * Game.BALL_Y_POSITION_AREA * Math.random();
         
         // Set the player at the center
         this.playerPositionX = this.canvas.width / 2;
@@ -72,12 +89,12 @@ class Game {
         // Some physics here: the y-portion of the speed changes due to gravity
         // Formula: Vt = V0 + gt
         // 9.8 is the gravitational constant and time=1
-        this.ballSpeedY -= 0.0098 * elapsed;
+        this.ballSpeedY -= Game.GRAVITY * elapsed;
         // Calculate new X and Y parts of the position 
         // Formula: S = v*t
         this.ballPositionX += this.ballSpeedX * elapsed;
         // Formula: S=v0*t + 0.5*g*t^2
-        this.ballPositionY += this.ballSpeedY * elapsed + 0.5 * 0.0098 * elapsed * elapsed;
+        this.ballPositionY += this.ballSpeedY * elapsed + 0.5 * Game.GRAVITY * elapsed * elapsed;
 
         // Collision detection: check if the ball hits the walls and let it bounce
         // Left wall
@@ -98,16 +115,16 @@ class Game {
 
         //  if the ball collides with the player. It's game over then
         const distX = this.playerPositionX - this.ballPositionX;
-        const distY = 50 - this.ballPositionY;
+        const distY = Game.PLAYER_BALL_RADIUS - this.ballPositionY;
         // Calculate the distance between ball and player using Pythagoras'
         // theorem
         const distance = Math.sqrt(distX * distX + distY * distY);
         // Collides is distance <= sum of radii of both circles
-        const gameover = distance <= (this.ballRadius + 50);
+        const gameover = distance <= (this.ballRadius + Game.PLAYER_BALL_RADIUS);
         return gameover;
     }
 
-    
+
     private render() {
         // Render the items on the canvas
         // Get the canvas rendering context
@@ -116,17 +133,18 @@ class Game {
         ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
         // Render the player
-        ctx.fillStyle = 'red';
+        ctx.fillStyle = Game.PLAYER_COLOR;
         ctx.beginPath();
-        ctx.ellipse(this.playerPositionX, 50, 50, 50, 0, 0, 2 * Math.PI);
+        ctx.ellipse(this.playerPositionX, Game.PLAYER_BALL_RADIUS, 
+            Game.PLAYER_BALL_RADIUS, Game.PLAYER_BALL_RADIUS, 0, 0, Game.FULL_CIRCLE);
         ctx.fill();
 
         // Render the ball
-        ctx.fillStyle = 'blue';
+        ctx.fillStyle = Game.BALL_COLOR;
         ctx.beginPath();
         // reverse height, so the ball falls down
         ctx.ellipse(this.ballPositionX, this.ballPositionY, this.ballRadius,
-            this.ballRadius, 0, 0, 2 * Math.PI);
+            this.ballRadius, 0, 0, Game.FULL_CIRCLE);
         ctx.fill();
     }
 
