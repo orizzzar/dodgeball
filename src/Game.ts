@@ -23,6 +23,11 @@ class Game {
 
     private scene: Scene;
 
+    /**
+     * Construct a new Game.
+     * 
+     * @param canvas the HTMLCanvasElement to render to
+     */
     public constructor(canvas: HTMLElement) {
         this.scene = new Scene(canvas);
 

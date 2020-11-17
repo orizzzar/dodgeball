@@ -1,3 +1,6 @@
+/**
+ * Responsible for maintaining the game scene logic.
+ */
 class Scene {
 
     private canvas: HTMLCanvasElement;
@@ -6,6 +9,11 @@ class Scene {
 
     private playerPositionX: number;
 
+    /**
+     * Construct a new Scene.
+     * 
+     * @param canvas the `HTMLCanvasElement` to render to
+     */
     public constructor(canvas: HTMLElement) {
         this.canvas = <HTMLCanvasElement>canvas;
         
@@ -25,6 +33,12 @@ class Scene {
         this.playerPositionX = this.canvas.width / 2;
     }
 
+    /**
+     * Advance the game simulation one step.
+     * 
+     * @param elapsed the amount of milliseconds that has passed since the last 
+     * update.
+     */
     public update(elapsed: number) {
         this.ball.applyPhysics(elapsed);
 
@@ -35,6 +49,10 @@ class Scene {
     }
 
 
+    /**
+     * Draw the game on the HTMLCanvasElement so the player can see what 
+     * happened.
+     */
     public render() {
         // Render the items on the canvas
         // Get the canvas rendering context

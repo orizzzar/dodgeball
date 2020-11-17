@@ -1,3 +1,6 @@
+/**
+ * Represents a single Ball in the game.
+ */
 class Ball {
     private radius: number;
     private positionX: number;
@@ -5,6 +8,11 @@ class Ball {
     private speedX: number;
     private speedY: number;
 
+    /**
+     * Construct a new `Ball`.
+     * 
+     * @param canvas The `canvas` that knows the size of the scene
+     */
     public constructor(canvas: HTMLCanvasElement) {
         this.radius = Game.MIN_BALL_RADIUS + Game.BALL_RADIUS_SCATTER * Math.random();
         this.speedX = -Game.MIN_BALL_X_SPEED + Game.BALL_X_SPEED_SCATTER * Math.random();
@@ -15,6 +23,12 @@ class Ball {
             + canvas.height * Game.BALL_Y_POSITION_AREA * Math.random();
     }
 
+    /**
+     * Apply the laws of physics to simulate a falling ball under gravity.
+     * 
+     * @param elapsed amount of milliseconds that passed since the last 
+     * update.
+     */
     public applyPhysics(elapsed: number) {
         // Calculate the new position of the ball
         // Some physics here: the y-portion of the speed changes due to gravity
@@ -28,6 +42,12 @@ class Ball {
         this.positionY += this.speedY * elapsed + 0.5 * Game.GRAVITY * elapsed * elapsed;
     }
 
+    /**
+     * Check whether the ball is currently hitting one of the canvas boundaries
+     * and let it bounce back.
+     *  
+     * @param canvas The canvas that knows the size of the scene
+     */
     public bounceFromCanvasWalls(canvas: HTMLCanvasElement) {
         // Collision detection: check if the ball hits the walls and let it bounce
         // Left wall
@@ -47,6 +67,14 @@ class Ball {
         }
     }
 
+    /**
+     * Checks whether the ball currently overlaps with another ball with the
+     * specified dimensions.
+     * 
+     * @param x the x-position of the other ball
+     * @param y the y-position of the other ball
+     * @param r the radius of the other ball
+     */
     public overlapsWith(x: number, y:number, r: number) {
         //  if the ball collides with the player. It's game over then
         const distX = x - this.positionX;
@@ -58,6 +86,11 @@ class Ball {
         return distance <= (this.radius + r);
     }
 
+    /**
+     * Let the ball draw itself on the specified context.
+     * 
+     * @param ctx the `CanvasRenderingContext2D` to render to
+     */
     public render(ctx: CanvasRenderingContext2D) {
         // Render the ball
         ctx.fillStyle = Game.BALL_COLOR;
