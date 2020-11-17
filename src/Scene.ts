@@ -3,9 +3,11 @@
  */
 class Scene {
 
+    public static readonly INITIAL_BALL_COUNT = 2;
+
     private canvas: HTMLCanvasElement;
 
-    private ball: Ball;
+    private balls: Ball[];
 
     private playerPositionX: number;
 
@@ -27,7 +29,11 @@ class Scene {
         ctx.transform(1, 0, 0, -1, 0, this.canvas.height);
 
         // Spawn a Ball
-        this.ball = new Ball(this.canvas);
+        // Spawn the Balls
+        this.balls = [];
+        for(let i=0; i<Scene.INITIAL_BALL_COUNT; i++) {
+            this.balls.push(new Ball(this.canvas));
+        }
         
         // Set the player at the center
         this.playerPositionX = this.canvas.width / 2;
@@ -40,13 +46,17 @@ class Scene {
      * update.
      */
     public update(elapsed: number) {
-        this.ball.applyPhysics(elapsed);
+        this.balls.forEach((ball) => {
+            ball.applyPhysics(elapsed);
+            ball.bounceFromCanvasWalls(this.canvas);
+        });
 
-        this.ball.bounceFromCanvasWalls(this.canvas);
-
-        return this.ball.overlapsWith(this.playerPositionX, 
-            Game.PLAYER_BALL_RADIUS, Game.PLAYER_BALL_RADIUS);
-    }
+        return this.balls.reduce((prev, ball) => 
+            prev || 
+            ball.overlapsWith(this.playerPositionX, 
+                Game.PLAYER_BALL_RADIUS, Game.PLAYER_BALL_RADIUS)
+          , false);
+      };
 
 
     /**
@@ -67,7 +77,7 @@ class Scene {
             Game.PLAYER_BALL_RADIUS, Game.PLAYER_BALL_RADIUS, 0, 0, Game.FULL_CIRCLE);
         ctx.fill();
         
-        this.ball.render(ctx);
+        this.balls.forEach((ball) => ball.render(ctx));
     }
 
 
