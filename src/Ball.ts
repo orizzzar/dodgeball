@@ -103,7 +103,13 @@ class Ball {
         ctx.fill();
     }
 
-    moveLeft(step: number, width: number) {
+    /**
+     * Move the ball to the left until it reaches its limit
+     * 
+     * @param step amount of pixels to move in this direction
+     * @param min the left limit of the ball position.
+     */
+    public moveLeft(step: number, min: number) {
         this.positionX -= step;
         const limit = this.radius;
         if (this.positionX < limit) {
@@ -111,9 +117,15 @@ class Ball {
         }
     }
 
-    moveRight(step: number, width: number) {
+    /**
+     * Move the ball to the right until it reaches its limit
+     * 
+     * @param step amount of pixels to move in this direction
+     * @param min the right limit of the ball position.
+     */
+    public moveRight(step: number, max: number) {
         this.positionX += step;
-        const limit = width - this.radius;
+        const limit = max - this.radius;
         if (this.positionX > limit) {
             this.positionX = limit;
         }

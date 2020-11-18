@@ -13,9 +13,7 @@ class Scene {
 
     private balls: Ball[];
 
-    //private playerPositionX: number;
-
-    private player: Ball;
+    private player: Player;
 
     /**
      * Construct a new Scene.
@@ -44,12 +42,7 @@ class Scene {
         }
         
         // Set the player at the center
-        this.player = new Ball(
-            Game.PLAYER_BALL_RADIUS,
-            this.canvas.width / 2, Game.PLAYER_BALL_RADIUS,
-            0,0,
-            Game.PLAYER_COLOR
-        );
+        this.player = new Player(this.canvas.width / 2);
     }
 
     private createBall(): Ball {
@@ -89,9 +82,11 @@ class Scene {
             ball.bounceFromCanvasWalls(this.canvas);
         });
 
+        this.balls = this.balls.filter((ball) => !this.player.isCaught(ball))
+
         return this.balls.reduce((prev, ball) => 
             prev || 
-            ball.overlapsWith(this.player)
+            this.player.isHit(ball)
           , false);
       };
 

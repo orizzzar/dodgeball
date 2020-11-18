@@ -17,7 +17,9 @@ class Game {
 
     // Constants for the player
     public static readonly PLAYER_BALL_RADIUS = 50;
+    public static readonly PLAYER_HAND_RADIUS = 15;
     public static readonly PLAYER_COLOR = 'red';
+    public static readonly PLAYER_HAND_COLOR = 'green';
 
     private previous: number;
 
