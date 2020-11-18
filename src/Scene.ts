@@ -13,7 +13,9 @@ class Scene {
 
     private balls: Ball[];
 
-    private playerPositionX: number;
+    //private playerPositionX: number;
+
+    private player: Ball;
 
     /**
      * Construct a new Scene.
@@ -38,11 +40,16 @@ class Scene {
         // Spawn the Balls
         this.balls = [];
         for(let i=0; i<Scene.INITIAL_BALL_COUNT; i++) {
-            this.balls.push();
+            this.balls.push(this.createBall());
         }
         
         // Set the player at the center
-        this.playerPositionX = this.canvas.width / 2;
+        this.player = new Ball(
+            Game.PLAYER_BALL_RADIUS,
+            this.canvas.width / 2, Game.PLAYER_BALL_RADIUS,
+            0,0,
+            Game.PLAYER_COLOR
+        );
     }
 
     private createBall(): Ball {
@@ -53,7 +60,8 @@ class Scene {
             this.canvas.height * (1-Game.BALL_Y_POSITION_AREA) 
             + this.canvas.height * Game.BALL_Y_POSITION_AREA * Math.random(),
             -Game.MIN_BALL_X_SPEED + Game.BALL_X_SPEED_SCATTER * Math.random(),
-            Game.MIN_BALL_Y_SPEED
+            Game.MIN_BALL_Y_SPEED,
+            Game.BALL_COLOR
         );
     }
 
@@ -61,13 +69,11 @@ class Scene {
      * Handle any user input that has happened since the last call. 
      */
     public processInput() {
-        if (this.keyboard.isKeyDown(KeyListener.KEY_RIGHT)
-        && this.playerPositionX < (this.canvas.width - Game.PLAYER_BALL_RADIUS)) {
-            this.playerPositionX+=Scene.PLAYER_STEP;
+        if (this.keyboard.isKeyDown(KeyListener.KEY_RIGHT)) {
+            this.player.moveRight(Scene.PLAYER_STEP, this.canvas.width);
         }
-        if (this.keyboard.isKeyDown(KeyListener.KEY_LEFT)
-        && this.playerPositionX > Game.PLAYER_BALL_RADIUS) {
-            this.playerPositionX-=Scene.PLAYER_STEP;
+        if (this.keyboard.isKeyDown(KeyListener.KEY_LEFT)) {
+            this.player.moveLeft(Scene.PLAYER_STEP, 0);
         }
     }
 
@@ -85,8 +91,7 @@ class Scene {
 
         return this.balls.reduce((prev, ball) => 
             prev || 
-            ball.overlapsWith(this.playerPositionX, 
-                Game.PLAYER_BALL_RADIUS, Game.PLAYER_BALL_RADIUS)
+            ball.overlapsWith(this.player)
           , false);
       };
 
@@ -103,14 +108,9 @@ class Scene {
         ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
         // Render the player
-        ctx.fillStyle = Game.PLAYER_COLOR;
-        ctx.beginPath();
-        ctx.ellipse(this.playerPositionX, Game.PLAYER_BALL_RADIUS, 
-            Game.PLAYER_BALL_RADIUS, Game.PLAYER_BALL_RADIUS, 0, 0, Game.FULL_CIRCLE);
-        ctx.fill();
+        this.player.render(ctx);
         
         this.balls.forEach((ball) => ball.render(ctx));
     }
-
 
 }

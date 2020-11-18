@@ -2,6 +2,8 @@
  * Represents a single Ball in the game.
  */
 class Ball {
+
+    private color: string;
     private radius: number;
     private positionX: number;
     private positionY: number;
@@ -14,12 +16,13 @@ class Ball {
      * @param canvas The `canvas` that knows the size of the scene
      */
     public constructor(radius: number, positionX: number, positionY: number, 
-        speedX: number, speedY: number) {
+        speedX: number, speedY: number, color: string) {
             this.radius = radius;
             this.positionX = positionX;
             this.positionY = positionY;
             this.speedX = speedX;
             this.speedY = speedY;
+            this.color = color;
     }
 
     /**
@@ -74,15 +77,15 @@ class Ball {
      * @param y the y-position of the other ball
      * @param r the radius of the other ball
      */
-    public overlapsWith(x: number, y:number, r: number) {
+    public overlapsWith(other: Ball) {
         //  if the ball collides with the player. It's game over then
-        const distX = x - this.positionX;
-        const distY = y - this.positionY;
+        const distX = other.positionX - this.positionX;
+        const distY = other.positionY - this.positionY;
         // Calculate the distance between ball and player using Pythagoras'
         // theorem
         const distance = Math.sqrt(distX * distX + distY * distY);
         // Collides is distance <= sum of radii of both circles
-        return distance <= (this.radius + r);
+        return distance <= (other.radius + this.radius);
     }
 
     /**
@@ -92,11 +95,28 @@ class Ball {
      */
     public render(ctx: CanvasRenderingContext2D) {
         // Render the ball
-        ctx.fillStyle = Game.BALL_COLOR;
+        ctx.fillStyle = this.color;
         ctx.beginPath();
         // reverse height, so the ball falls down
         ctx.ellipse(this.positionX, this.positionY, this.radius,
             this.radius, 0, 0, Game.FULL_CIRCLE);
         ctx.fill();
     }
+
+    moveLeft(step: number, width: number) {
+        this.positionX -= step;
+        const limit = this.radius;
+        if (this.positionX < limit) {
+            this.positionX = limit;
+        }
+    }
+
+    moveRight(step: number, width: number) {
+        this.positionX += step;
+        const limit = width - this.radius;
+        if (this.positionX > limit) {
+            this.positionX = limit;
+        }
+    }
+
 }
