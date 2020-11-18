@@ -15,6 +15,8 @@ class Scene {
 
     private player: Player;
 
+    private score: number;
+
     /**
      * Construct a new Scene.
      * 
@@ -34,7 +36,8 @@ class Scene {
         const ctx = this.canvas.getContext('2d');
         ctx.transform(1, 0, 0, -1, 0, this.canvas.height);
 
-        // Spawn a Ball
+        this.score = 0;
+
         // Spawn the Balls
         this.balls = [];
         for(let i=0; i<Scene.INITIAL_BALL_COUNT; i++) {
@@ -82,7 +85,10 @@ class Scene {
             ball.bounceFromCanvasWalls(this.canvas);
         });
 
+        const cbc = this.balls.length;
         this.balls = this.balls.filter((ball) => !this.player.isCaught(ball))
+        const nbc = this.balls.length;
+        this.score+=(cbc-nbc);
 
         return this.balls.reduce((prev, ball) => 
             prev || 
@@ -101,6 +107,13 @@ class Scene {
         const ctx = this.canvas.getContext('2d');
         // Clear the entire canvas
         ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+        ctx.save();
+        ctx.fillStyle = "black";
+        ctx.resetTransform();
+        ctx.font = '20px serif';
+        ctx.fillText(`Score: ${this.score}`, 0, 20);
+        ctx.restore();
 
         // Render the player
         this.player.render(ctx);
