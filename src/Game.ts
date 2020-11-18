@@ -12,6 +12,7 @@ class Game {
     public static readonly MIN_BALL_X_SPEED = -0.5;
     public static readonly BALL_X_SPEED_SCATTER = 1;
     public static readonly MIN_BALL_Y_SPEED = 0;
+    public static readonly BALL_Y_SPEED_SCATTER = 1;
     public static readonly BALL_Y_POSITION_AREA = 0.2;
     public static readonly BALL_COLOR = 'blue';
 

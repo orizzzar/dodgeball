@@ -58,7 +58,7 @@ class Scene {
             this.canvas.height * (1-Game.BALL_Y_POSITION_AREA) 
             + this.canvas.height * Game.BALL_Y_POSITION_AREA * Math.random(),
             -Game.MIN_BALL_X_SPEED + Game.BALL_X_SPEED_SCATTER * Math.random(),
-            Game.MIN_BALL_Y_SPEED,
+            Game.MIN_BALL_Y_SPEED + Game.BALL_Y_SPEED_SCATTER * Math.random(),
             Game.BALL_COLOR
         );
     }
