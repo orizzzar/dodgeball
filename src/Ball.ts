@@ -115,7 +115,7 @@ class Ball {
      */
     public moveLeft(step: number, min: number) {
         this.position = this.position.subtract(new Vector(step, 0));
-        const limit = this.radius;
+        const limit = min + this.radius;
         if (this.position.x < limit) {
             this.position = new Vector(limit, this.position.y);
         }
@@ -135,4 +135,20 @@ class Ball {
         }
     }
 
+    public processCollisionWith(other: Ball) {
+        // Create a vector in the direction away from the other ball:
+        const angle = this.position.subtract(other.position).angle;
+        // Calculate the correct size of the impulse
+        const vdiff = other.speed.subtract(this.speed);
+        const size = vdiff.length * Math.cos(
+            vdiff.angle - angle
+        );
+
+        // Create the speed change vector: the impulse
+        let impulse = Vector.fromSizeAndAngle(size, angle);
+        // Change the speed by adding the impulse
+        this.speed = this.speed.add(impulse);
+        impulse = Vector.fromSizeAndAngle(size, angle+Math.PI);
+        other.speed = other.speed.add(impulse);
+    }
 }

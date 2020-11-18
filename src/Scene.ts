@@ -3,7 +3,7 @@
  */
 class Scene {
 
-    public static readonly INITIAL_BALL_COUNT = 2;
+    public static readonly INITIAL_BALL_COUNT = 6;
 
     public static readonly PLAYER_STEP = 5;
 
@@ -87,16 +87,30 @@ class Scene {
             ball.bounceFromCanvasWalls(this.canvas);
         });
 
-        const currentBallCount = this.balls.length;
-        this.balls = this.balls.filter((ball) => !this.player.isCaught(ball))
-        const newBallCount = this.balls.length;
-        this.score+=(currentBallCount - newBallCount);
+        for (let i=0; i<this.balls.length; i++) {
+            for (let j=i; j<this.balls.length; j++) {
+                this.processBallBallCollision(this.balls[i], this.balls[j]);
+            }
+        }
 
-        return this.balls.reduce((prev, ball) => 
-            prev || 
-            this.player.isHit(ball)
-          , false);
-    };
+        // const currentBallCount = this.balls.length;
+        // this.balls = this.balls.filter((ball) => !this.player.isCaught(ball))
+        // const newBallCount = this.balls.length;
+        // this.score+=(currentBallCount - newBallCount);
+
+        // return this.balls.reduce((prev, ball) => 
+        //     prev || 
+        //     this.player.isHit(ball)
+        //   , false);
+        return false;
+    }
+    
+    processBallBallCollision(b0: Ball, b1: Ball) {
+        if (b0.overlapsWith(b1)) {
+            b0.processCollisionWith(b1);
+        }
+    }
+;
 
     public isWin(): boolean {
         return this.balls.length == 0;
