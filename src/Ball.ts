@@ -13,14 +13,13 @@ class Ball {
      * 
      * @param canvas The `canvas` that knows the size of the scene
      */
-    public constructor(canvas: HTMLCanvasElement) {
-        this.radius = Game.MIN_BALL_RADIUS + Game.BALL_RADIUS_SCATTER * Math.random();
-        this.speedX = -Game.MIN_BALL_X_SPEED + Game.BALL_X_SPEED_SCATTER * Math.random();
-        this.speedY = Game.MIN_BALL_Y_SPEED;
-        this.positionX = this.radius +  
-            (canvas.width - 2 * this.radius)*Math.random();
-        this.positionY = canvas.height * (1-Game.BALL_Y_POSITION_AREA) 
-            + canvas.height * Game.BALL_Y_POSITION_AREA * Math.random();
+    public constructor(radius: number, positionX: number, positionY: number, 
+        speedX: number, speedY: number) {
+            this.radius = radius;
+            this.positionX = positionX;
+            this.positionY = positionY;
+            this.speedX = speedX;
+            this.speedY = speedY;
     }
 
     /**

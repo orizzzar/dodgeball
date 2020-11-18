@@ -38,11 +38,23 @@ class Scene {
         // Spawn the Balls
         this.balls = [];
         for(let i=0; i<Scene.INITIAL_BALL_COUNT; i++) {
-            this.balls.push(new Ball(this.canvas));
+            this.balls.push();
         }
         
         // Set the player at the center
         this.playerPositionX = this.canvas.width / 2;
+    }
+
+    private createBall(): Ball {
+        const radius = Game.MIN_BALL_RADIUS + Game.BALL_RADIUS_SCATTER * Math.random();
+        return new Ball(
+            radius,
+            radius + (this.canvas.width - 2 * radius)*Math.random(),
+            this.canvas.height * (1-Game.BALL_Y_POSITION_AREA) 
+            + this.canvas.height * Game.BALL_Y_POSITION_AREA * Math.random(),
+            -Game.MIN_BALL_X_SPEED + Game.BALL_X_SPEED_SCATTER * Math.random(),
+            Game.MIN_BALL_Y_SPEED
+        );
     }
 
     /**
