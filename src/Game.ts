@@ -47,6 +47,8 @@ class Game {
         const elapsed = timestamp - this.previous;
         this.previous = timestamp;
 
+        this.scene.processInput();
+
         const gameover = this.scene.update(elapsed);
 
         this.scene.render();

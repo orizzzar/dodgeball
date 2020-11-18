@@ -5,7 +5,11 @@ class Scene {
 
     public static readonly INITIAL_BALL_COUNT = 2;
 
+    public static readonly PLAYER_STEP = 5;
+
     private canvas: HTMLCanvasElement;
+
+    private keyboard: KeyListener;
 
     private balls: Ball[];
 
@@ -18,6 +22,8 @@ class Scene {
      */
     public constructor(canvas: HTMLElement) {
         this.canvas = <HTMLCanvasElement>canvas;
+
+        this.keyboard = new KeyListener();
         
         // Resize the canvas to full window size
         this.canvas.width = window.innerWidth - 1;
@@ -37,6 +43,20 @@ class Scene {
         
         // Set the player at the center
         this.playerPositionX = this.canvas.width / 2;
+    }
+
+    /**
+     * Handle any user input that has happened since the last call. 
+     */
+    public processInput() {
+        if (this.keyboard.isKeyDown(KeyListener.KEY_RIGHT)
+        && this.playerPositionX < (this.canvas.width - Game.PLAYER_BALL_RADIUS)) {
+            this.playerPositionX+=Scene.PLAYER_STEP;
+        }
+        if (this.keyboard.isKeyDown(KeyListener.KEY_LEFT)
+        && this.playerPositionX > Game.PLAYER_BALL_RADIUS) {
+            this.playerPositionX-=Scene.PLAYER_STEP;
+        }
     }
 
     /**
