@@ -15,6 +15,7 @@ class Scene {
 
     private player: Player;
 
+    private level: number;
     private score: number;
 
     /**
@@ -22,7 +23,7 @@ class Scene {
      * 
      * @param canvas the `HTMLCanvasElement` to render to
      */
-    public constructor(canvas: HTMLElement) {
+    public constructor(canvas: HTMLElement, level: number, score: number=0) {
         this.canvas = <HTMLCanvasElement>canvas;
 
         this.keyboard = new KeyListener();
@@ -36,11 +37,12 @@ class Scene {
         const ctx = this.canvas.getContext('2d');
         ctx.transform(1, 0, 0, -1, 0, this.canvas.height);
 
-        this.score = 0;
+        this.score = score;
+        this.level = level;
 
         // Spawn the Balls
         this.balls = [];
-        for(let i=0; i<Scene.INITIAL_BALL_COUNT; i++) {
+        for(let i=0; i<level; i++) {
             this.balls.push(this.createBall());
         }
         
@@ -94,8 +96,19 @@ class Scene {
             prev || 
             this.player.isHit(ball)
           , false);
-      };
+    };
 
+    public isWin(): boolean {
+        return this.balls.length == 0;
+    }
+
+    public getScore(): number {
+        return this.score;
+    }
+
+    public getLevel(): number {
+        return this.level;
+    }
 
     /**
      * Draw the game on the HTMLCanvasElement so the player can see what 

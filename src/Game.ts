@@ -17,7 +17,7 @@ class Game {
 
     // Constants for the player
     public static readonly PLAYER_BALL_RADIUS = 50;
-    public static readonly PLAYER_HAND_RADIUS = 15;
+    public static readonly PLAYER_HAND_RADIUS = 50;
     public static readonly PLAYER_COLOR = 'red';
     public static readonly PLAYER_HAND_COLOR = 'green';
 
@@ -32,6 +32,8 @@ class Game {
      * The size of the fixed time steps that the game's "now" will be updated.
      */
     protected readonly ms_per_update: number = 1;
+
+    private canvas: HTMLElement;
     
     private scene: Scene;
 
@@ -41,7 +43,8 @@ class Game {
      * @param canvas the HTMLCanvasElement to render to
      */
     public constructor(canvas: HTMLElement) {
-        this.scene = new Scene(canvas);
+        this.canvas = canvas;
+        this.scene = new Scene(canvas, Scene.INITIAL_BALL_COUNT);
 
         // Start the animation
         console.log('start animation');
@@ -70,8 +73,15 @@ class Game {
             this.lag -= this.ms_per_update;
         }
         this.scene.render();
-        if (gameover)
-            console.log("Game Over");
+
+        if (this.scene.isWin()) {
+            this.scene = new Scene(
+                this.canvas, 
+                this.scene.getLevel()+1, 
+                this.scene.getScore()
+            );
+        }
+
         
         // Call this method again on the next animation frame
         // A quick-and-dirty game over situation: just stop animating :/
