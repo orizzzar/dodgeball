@@ -5,10 +5,15 @@ class Ball {
 
     private color: string;
     private radius: number;
-    private positionX: number;
-    private positionY: number;
-    private speedX: number;
-    private speedY: number;
+
+    private position: Vector;
+
+    private speed: Vector;
+
+    // private positionX: number;
+    // private positionY: number;
+    // private speedX: number;
+    // private speedY: number;
 
     /**
      * Construct a new `Ball`.
@@ -18,10 +23,8 @@ class Ball {
     public constructor(radius: number, positionX: number, positionY: number, 
         speedX: number, speedY: number, color: string) {
             this.radius = radius;
-            this.positionX = positionX;
-            this.positionY = positionY;
-            this.speedX = speedX;
-            this.speedY = speedY;
+            this.position = new Vector(positionX, positionY);
+            this.speed = new Vector(speedX, speedY);
             this.color = color;
     }
 
@@ -33,15 +36,18 @@ class Ball {
      */
     public applyPhysics(elapsed: number) {
         // Calculate the new position of the ball
-        // Some physics here: the y-portion of the speed changes due to gravity
+        // Some physics here:
+        // Calculate new X and Y parts of the position 
+        // Formula for X: S = v*t
+        // Formula for Y: S=v0*t + 0.5*g*t^2
+        this.position = this.position.add(new Vector(
+            this.speed.x * elapsed,
+            this.speed.y * elapsed + 0.5 * Game.GRAVITY * elapsed * elapsed
+        ));
+        // The y-portion of the speed changes due to gravity
         // Formula: Vt = V0 + gt
         // 9.8 is the gravitational constant and time=1
-        this.speedY -= Game.GRAVITY * elapsed;
-        // Calculate new X and Y parts of the position 
-        // Formula: S = v*t
-        this.positionX += this.speedX * elapsed;
-        // Formula: S=v0*t + 0.5*g*t^2
-        this.positionY += this.speedY * elapsed + 0.5 * Game.GRAVITY * elapsed * elapsed;
+        this.speed = this.speed.subtract(new Vector(0, Game.GRAVITY * elapsed));
     }
 
     /**
@@ -53,19 +59,19 @@ class Ball {
     public bounceFromCanvasWalls(canvas: HTMLCanvasElement) {
         // Collision detection: check if the ball hits the walls and let it bounce
         // Left wall
-        this.positionX >= canvas.width - this.radius;
-        if (this.positionX <= this.radius && this.speedX < 0) {
-            this.speedX = -this.speedX;
+        this.position.x >= canvas.width - this.radius;
+        if (this.position.x <= this.radius && this.speed.x < 0) {
+            this.speed = this.speed.mirror_Y();
         }
         // Right wall
-        if (this.positionX >= canvas.width - this.radius
-            && this.speedX > 0) {
-            this.speedX = -this.speedX;
+        if (this.position.x >= canvas.width - this.radius
+            && this.speed.x > 0) {
+                this.speed = this.speed.mirror_Y();
         }
 
         // Bottom only (ball will always come down)
-        if (this.positionY <= this.radius && this.speedY < 0) {
-            this.speedY = -this.speedY;
+        if (this.position.y <= this.radius && this.speed.y < 0) {
+            this.speed = this.speed.mirror_X();
         }
     }
 
@@ -79,11 +85,9 @@ class Ball {
      */
     public overlapsWith(other: Ball) {
         //  if the ball collides with the player. It's game over then
-        const distX = other.positionX - this.positionX;
-        const distY = other.positionY - this.positionY;
         // Calculate the distance between ball and player using Pythagoras'
         // theorem
-        const distance = Math.sqrt(distX * distX + distY * distY);
+        const distance = other.position.subtract(this.position).length;
         // Collides is distance <= sum of radii of both circles
         return distance <= (other.radius + this.radius);
     }
@@ -98,7 +102,7 @@ class Ball {
         ctx.fillStyle = this.color;
         ctx.beginPath();
         // reverse height, so the ball falls down
-        ctx.ellipse(this.positionX, this.positionY, this.radius,
+        ctx.ellipse(this.position.x, this.position.y, this.radius,
             this.radius, 0, 0, Game.FULL_CIRCLE);
         ctx.fill();
     }
@@ -110,10 +114,10 @@ class Ball {
      * @param min the left limit of the ball position.
      */
     public moveLeft(step: number, min: number) {
-        this.positionX -= step;
+        this.position = this.position.subtract(new Vector(step, 0));
         const limit = this.radius;
-        if (this.positionX < limit) {
-            this.positionX = limit;
+        if (this.position.x < limit) {
+            this.position = new Vector(limit, this.position.y);
         }
     }
 
@@ -124,10 +128,10 @@ class Ball {
      * @param min the right limit of the ball position.
      */
     public moveRight(step: number, max: number) {
-        this.positionX += step;
+        this.position = this.position.add(new Vector(step, 0));
         const limit = max - this.radius;
-        if (this.positionX > limit) {
-            this.positionX = limit;
+        if (this.position.x > limit) {
+            this.position = new Vector(limit, this.position.y);
         }
     }
 
